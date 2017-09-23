@@ -1,5 +1,6 @@
 package memes.memonic;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +8,9 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
@@ -24,7 +27,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
@@ -32,7 +37,9 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 
 import okhttp3.MediaType;
@@ -47,7 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private JSONObject jsonObject;
     Bitmap photo;
-    String stringImage;
+    byte[] imagebytes;
+
+    JSONObject response;
 
 //    RequestQueue queue = Volley.newRequestQueue(this);
     String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize";
@@ -57,13 +66,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.INTERNET, Manifest.permission.ACCESS_WIFI_STATE,
+                            Manifest.permission.ACCESS_NETWORK_STATE,
+                            Manifest.permission.CHANGE_WIFI_STATE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                    }
+                    , 1);
+        }
+
         this.imageView = (ImageView) this.findViewById(R.id.imageView1);
 
         Button pushButton = (Button) this.findViewById(R.id.push);
         pushButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                posty(url,getResources().getString(R.string.Sub_key), stringImage);
+            public void onClick(View view){
+                if(imagebytes != null && isNetworkAvailable()){
+                    response = posty(url,getResources().getString(R.string.Sub_key), imagebytes);
+                    Log.d("YAY", "SUCCESS");
+                    if(response == null){
+                        Log.d("Bad", "Garbage");
+                    }else{
+                        Log.d("O MAI", response.toString());
+                    }
+                }
+                else{
+                    Log.d("TRASH", "BAD");
+                }
             }
         });
         Button photoButton = (Button) this.findViewById(R.id.button1);
@@ -95,9 +126,8 @@ public class MainActivity extends AppCompatActivity {
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] imageBytes = baos.toByteArray();
-            stringImage = Arrays.toString(imageBytes);
-            Log.d("Imagebyte", Arrays.toString(imageBytes));
+            imagebytes = baos.toByteArray();
+
 
 //            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 //            if (data != null) {
@@ -118,15 +148,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public JSONObject posty(String url,String key, String... strings){
+    public JSONObject posty(String url,String key, byte[]... strings){
         String result = "";
-        String personId = strings[0];
         HttpClient httpclient = new DefaultHttpClient();
         try {
             URIBuilder builder = new URIBuilder(url);
             URI uri = builder.build();
-            HttpGet request = new HttpGet(uri);
+            HttpPost request = new HttpPost(uri);
+            request.setHeader("Content-Type", "application/octet-stream");
             request.setHeader("Ocp-Apim-Subscription-Key", key);
+
+            StringEntity reqEntity = new StringEntity(Arrays.toString(strings));
+            request.setEntity(reqEntity);
             HttpResponse response = httpclient.execute(request);
             HttpEntity entity = response.getEntity();
 
@@ -135,12 +168,18 @@ public class MainActivity extends AppCompatActivity {
             }
 
             JSONObject emotionData = new JSONObject(result);
-            String emotion = emotionData.getString("name");
 
             return emotionData;
         } catch (Exception e) {
             JSONObject aa = null;
             return aa;
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 }
