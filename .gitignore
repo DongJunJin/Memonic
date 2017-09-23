@@ -10,7 +10,7 @@
 bin/
 gen/
 .gradle/*
-.idea/*
+/.idea/*
 build/*
 libs/*
 obj/*
