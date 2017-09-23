@@ -7,3 +7,10 @@
 /build
 /captures
 .externalNativeBuild
+bin/
+gen/
+.gradle/*
+.idea/*
+build/*
+libs/*
+obj/*
