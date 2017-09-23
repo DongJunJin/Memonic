@@ -12,3 +12,4 @@ gen/
 build/*
 libs/*
 obj/*
+/app/res/values/keys.xml
