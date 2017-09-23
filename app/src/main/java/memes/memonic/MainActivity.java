@@ -15,13 +15,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.microsoft.projectoxford.emotion.EmotionServiceClient;
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.util.Arrays;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -34,8 +46,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
     private JSONObject jsonObject;
+    Bitmap photo;
+    String stringImage;
 
-
+//    RequestQueue queue = Volley.newRequestQueue(this);
+    String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.imageView = (ImageView) this.findViewById(R.id.imageView1);
+
+        Button pushButton = (Button) this.findViewById(R.id.push);
+        pushButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                posty(url,getResources().getString(R.string.Sub_key), stringImage);
+            }
+        });
         Button photoButton = (Button) this.findViewById(R.id.button1);
         photoButton.setOnClickListener(new View.OnClickListener() {
 
@@ -67,28 +90,57 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] imageBytes = baos.toByteArray();
-//            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-            if (requestCode == 1 && data != null) {
-                if (resultCode == RESULT_OK) {
-                    Requester requester = new Requester();
+            stringImage = Arrays.toString(imageBytes);
+            Log.d("Imagebyte", Arrays.toString(imageBytes));
 
-                    String response = null;
-                    try {
-                        response = requester.post("https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize", imageBytes);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Log.d("Memes", response);
-                }
-                if (requestCode == RESULT_CANCELED) {
-                }
+//            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+//            if (data != null) {
+//                if (resultCode == RESULT_OK) {
+//                    Requester requester = new Requester();
+//
+//                    String response = null;
+//                    try {
+//                        response = requester.post(client, , stringImage, getResources().getString(R.string.Sub_key));
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    Log.d("Memes", response);
+//                }
+//                if (requestCode == RESULT_CANCELED) {
+//                }
+//            }
+        }
+    }
+
+    public JSONObject posty(String url,String key, String... strings){
+        String result = "";
+        String personId = strings[0];
+        HttpClient httpclient = new DefaultHttpClient();
+        try {
+            URIBuilder builder = new URIBuilder(url);
+            URI uri = builder.build();
+            HttpGet request = new HttpGet(uri);
+            request.setHeader("Ocp-Apim-Subscription-Key", key);
+            HttpResponse response = httpclient.execute(request);
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                result = EntityUtils.toString(entity);
             }
+
+            JSONObject emotionData = new JSONObject(result);
+            String emotion = emotionData.getString("name");
+
+            return emotionData;
+        } catch (Exception e) {
+            JSONObject aa = null;
+            return aa;
         }
     }
 }
