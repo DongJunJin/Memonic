@@ -1,10 +1,6 @@
 *.iml
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.idea/gradle.xml
-.idea/misc.xml
 .DS_Store
 /build
 /captures
@@ -12,7 +8,7 @@
 bin/
 gen/
 .gradle/*
-/.idea/*
+.idea/*
 build/*
 libs/*
 obj/*
