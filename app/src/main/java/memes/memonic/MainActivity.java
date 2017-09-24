@@ -6,41 +6,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.microsoft.projectoxford.emotion.EmotionServiceClient;
-import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -67,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     , 1);
         }
-        this.imageView = (ImageView) this.findViewById(R.id.imageView1);
+        //this.imageView = (ImageView) this.findViewById(R.id.imageView1);
 
-        Button pushButton = (Button) this.findViewById(R.id.push);
+        ImageView pushButton = (ImageView) this.findViewById(R.id.push);
 
         pushButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button photoButton = (Button) this.findViewById(R.id.button1);
+        ImageView photoButton = (ImageView) this.findViewById(R.id.upload);
         photoButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -106,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
-            imageView.setImageBitmap(photo);
+            //imageView.setImageBitmap(photo);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -125,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     private class SyncedTask extends AsyncTask<String, Integer, JSONObject> {
         @Override
         protected JSONObject doInBackground(String... params) {
-            posty(url,getResources().getString(R.string.Sub_key),imagebytes);
+            posty(url,"afac5dce35cb428eabff3e082800df9b",imagebytes);
             return null;
         }
 

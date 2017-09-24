@@ -1,29 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/colorPrimaryDark"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <Button
-        android:id="@+id/button1"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="string/photo">
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:weightSum="1">
 
-    </Button>
+        <Button
+            android:id="@+id/view"
+            android:text="Explore Memonics"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="25dp"
+            android:textColor="#FFF"
+            android:background="#00FFFFFF"
+            android:textSize="25pt" >
+        </Button>
 
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:layout_width="wrap_content">
+    </LinearLayout>
 
-    </ImageView>
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/push"
-        android:text="Push"/>
+        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:layout_weight="0"
+        android:weightSum="1">
 
+        <ImageView
+            android:id="@+id/upload"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginRight="50dp"
+            android:layout_weight="0.05"
+            android:src="@mipmap/ic_add_black_48dp">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/push"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_marginLeft="50dp"
+            android:layout_weight="0.05"
+            android:src="@mipmap/ic_send_black_48dp">
+
+        </ImageView>
+    </LinearLayout>
 </LinearLayout>
+
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:orientation="vertical"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="fill_parent">-->
+
+    <!--<Button-->
+        <!--android:id="@+id/button1"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="string/photo">-->
+
+    <!--</Button>-->
+
+    <!--<ImageView-->
+        <!--android:id="@+id/imageView1"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:layout_width="wrap_content">-->
+
+    <!--</ImageView>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/push"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Push"/>-->
+
+<!--</LinearLayout>-->
