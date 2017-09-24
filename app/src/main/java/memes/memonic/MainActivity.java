@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -35,11 +36,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import org.apache.commons.io.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -92,11 +95,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                long time = System.currentTimeMillis();
                 cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 outputFileUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"Pic_" +
-                        String.valueOf(System.currentTimeMillis()) + ".jpg"));
+                        String.valueOf(time) + ".jpg"));
                 file = new File(Environment.getExternalStorageDirectory(),"Pic_" +
-                        String.valueOf(System.currentTimeMillis()) + ".jpg");
+                        String.valueOf(time) + ".jpg");
 
                 cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, outputFileUri);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
@@ -124,9 +128,16 @@ public class MainActivity extends AppCompatActivity {
                 baos = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 inputStream = new ByteArrayInputStream(baos.toByteArray());
-                imagebytes = baos.toByteArray();
-                tossValue = Base64.encodeToString(imagebytes, Base64.DEFAULT);
-                Log.d("Value", tossValue);
+                //imagebytes = baos.toByteArray();
+                try {
+                    imagebytes = FileUtils.readFileToByteArray(file);
+                    tossValue = Base64.encodeToString(imagebytes, Base64.DEFAULT);
+                    Log.d("Value", tossValue);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
 //                if(tossValue != null){
 //                        Log.d("Penis Head", tossValue);
 //                    String source = file.toURI().toString();
@@ -177,6 +188,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     }
+
+//    public void run() {
+//        Image mImage = (Image) file;
+//        ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
+//        byte[] bytes = new byte[buffer.remaining()];
+//        buffer.get(bytes);
+//        FileOutputStream output = null;
+//        try {
+//            output = new FileOutputStream(file.getAbsolutePath());
+//            output.write(bytes);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            mImage.close();
+//            if (null != output) {
+//                try {
+//                    output.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
     public byte[] getBytes(InputStream inputStream) throws IOException {
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
