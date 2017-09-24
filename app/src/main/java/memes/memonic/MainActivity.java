@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,8 +31,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -42,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     Intent cameraIntent;
     JSONObject jsonResponse;
     String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize";
+    File file;
+    String tossValue;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         pushButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (imagebytes != null && isNetworkAvailable()) {
+                if (isNetworkAvailable()) {
                     new SyncedTask().execute();
                     Log.d("YAY", "SUCCESS");
                 } else {
@@ -84,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
                 cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 outputFileUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(),"Pic_" +
                         String.valueOf(System.currentTimeMillis()) + ".jpg"));
+                file = new File(Environment.getExternalStorageDirectory(),"Pic_" +
+                        String.valueOf(System.currentTimeMillis()) + ".jpg");
+
                 cameraIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, outputFileUri);
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }
@@ -101,9 +115,79 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            imagebytes = baos.toByteArray();
+            ByteArrayOutputStream baos;
+            ByteArrayInputStream inputStream;
+            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+            if(bitmap != null){
+                Log.d("Success" , "Success");
+                //Convert to Base64
+                baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                inputStream = new ByteArrayInputStream(baos.toByteArray());
+                imagebytes = baos.toByteArray();
+                tossValue = Base64.encodeToString(imagebytes, Base64.DEFAULT);
+                Log.d("Value", tossValue);
+//                if(tossValue != null){
+//                        Log.d("Penis Head", tossValue);
+//                    String source = file.toURI().toString();
+//                    args = new Bundle();
+//                    store = new Bundle();
+//                    args.putString("Imagefile", source);
+
+//            InputStream iStream = null;
+//            try {
+//                iStream = getContentResolver().openInputStream(outputFileUri);
+//                imagebytes = getBytes(iStream);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+//            RandomAccessFile f = null;
+//            try {
+//                f = new RandomAccessFile(file.getAbsolutePath(), "r");
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+////                imagebytes = new byte[0];
+//            try {
+//                imagebytes = new byte[(int)f.length()];
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            try {
+//                f.readFully(imagebytes);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            try {
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+//            int bytes = bitmap.getByteCount();
+//            ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
+//            bitmap.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
+
+//            imagebytes = buffer.array(); //Get the underlying array containing the data.
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
+    }
+    }
+
+    public byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 
     private boolean isNetworkAvailable() {
@@ -116,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
     private class SyncedTask extends AsyncTask<String, Integer, JSONObject> {
         @Override
         protected JSONObject doInBackground(String... params) {
-            posty(url,"afac5dce35cb428eabff3e082800df9b",imagebytes);
+            posty(url,"afac5dce35cb428eabff3e082800df9b",tossValue);
             return null;
         }
 
@@ -128,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),progress[0].toString(),Toast.LENGTH_LONG).show();
         }
 
-        public JSONObject posty(String url, String key, byte[]... strings) {
+        public JSONObject posty(String url, String key, String... strings) {
             String result = "";
 
                 HttpClient httpClient = new DefaultHttpClient();

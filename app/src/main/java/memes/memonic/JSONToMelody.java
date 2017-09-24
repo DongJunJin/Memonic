@@ -67,13 +67,13 @@ public class JSONToMelody extends JSONObject {
 
 
     // get melody corresponding to emotion
-    Map<String,Integer> emotionToMelodyHashMap = new HashMap<String,Integer>();
-    emotionToMelodyHashMap.put("anger", MainActivity.ExtraData().R.raw.cw);
-    emotionToMelodyHashMap.put("disgust", R.raw.em);
-    emotionToMelodyHashMap.put("happiness", R.raw.gm);
-    emotionToMelodyHashMap.put("neutral", R.raw.am);
-    emotionToMelodyHashMap.put("sadness", R.raw.dm);
-    emotionToMelodyHashMap.put("surprise", R.raw.crm);
+//    Map<String,Integer> emotionToMelodyHashMap = new HashMap<String,Integer>();
+//    emotionToMelodyHashMap.put("anger", MainActivity.ExtraData().R.raw.cw);
+//    emotionToMelodyHashMap.put("disgust", R.raw.em);
+//    emotionToMelodyHashMap.put("happiness", R.raw.gm);
+//    emotionToMelodyHashMap.put("neutral", R.raw.am);
+//    emotionToMelodyHashMap.put("sadness", R.raw.dm);
+//    emotionToMelodyHashMap.put("surprise", R.raw.crm);
 
 
 
@@ -81,15 +81,15 @@ public class JSONToMelody extends JSONObject {
     // create melodies list
     //melodiesArr
 
-    ArrayList<Integer> createMelodiesArray() {
-        int size = arrEmotions.size();
-
-        for (int i = 0; i < size; i++) {
-            arrMelodies.add(emotionToMelodyHashMap.get(arrEmotions.get(i)));
-        }
-
-        return arrMelodies;
-    }
+//    ArrayList<Integer> createMelodiesArray() {
+//        int size = arrEmotions.size();
+//
+//        for (int i = 0; i < size; i++) {
+//            arrMelodies.add(emotionToMelodyHashMap.get(arrEmotions.get(i)));
+//        }
+//
+//        return arrMelodies;
+//    }
 
 
 
