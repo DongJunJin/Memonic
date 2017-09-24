@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -17,14 +18,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.microsoft.projectoxford.emotion.EmotionServiceClient;
 import com.microsoft.projectoxford.emotion.EmotionServiceRestClient;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -42,23 +43,13 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
-    private JSONObject jsonObject;
     Bitmap photo;
     byte[] imagebytes;
-
-    JSONObject response;
-
-//    RequestQueue queue = Volley.newRequestQueue(this);
+    JSONObject jsonResponse;
     String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize";
 
     @Override
@@ -76,27 +67,22 @@ public class MainActivity extends AppCompatActivity {
                     }
                     , 1);
         }
-
         this.imageView = (ImageView) this.findViewById(R.id.imageView1);
 
         Button pushButton = (Button) this.findViewById(R.id.push);
+
         pushButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
-                if(imagebytes != null && isNetworkAvailable()){
-                    response = posty(url,getResources().getString(R.string.Sub_key), imagebytes);
+            public void onClick(View view) {
+                if (imagebytes != null && isNetworkAvailable()) {
+                    new SyncedTask().execute();
                     Log.d("YAY", "SUCCESS");
-                    if(response == null){
-                        Log.d("Bad", "Garbage");
-                    }else{
-                        Log.d("O MAI", response.toString());
-                    }
-                }
-                else{
+                } else {
                     Log.d("TRASH", "BAD");
                 }
             }
         });
+
         Button photoButton = (Button) this.findViewById(R.id.button1);
         photoButton.setOnClickListener(new View.OnClickListener() {
 
@@ -107,19 +93,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        EmotionServiceRestClient
-
         ConnectivityManager cm =
-                (ConnectivityManager)getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
 
-        Log.d("Network", isConnected ? "works" : "doesnt work" );
+        Log.d("Network", isConnected ? "works" : "doesnt work");
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
             imageView.setImageBitmap(photo);
@@ -127,52 +111,6 @@ public class MainActivity extends AppCompatActivity {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             imagebytes = baos.toByteArray();
-
-
-//            String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-//            if (data != null) {
-//                if (resultCode == RESULT_OK) {
-//                    Requester requester = new Requester();
-//
-//                    String response = null;
-//                    try {
-//                        response = requester.post(client, , stringImage, getResources().getString(R.string.Sub_key));
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    Log.d("Memes", response);
-//                }
-//                if (requestCode == RESULT_CANCELED) {
-//                }
-//            }
-        }
-    }
-
-    public JSONObject posty(String url,String key, byte[]... strings){
-        String result = "";
-        HttpClient httpclient = new DefaultHttpClient();
-        try {
-            URIBuilder builder = new URIBuilder(url);
-            URI uri = builder.build();
-            HttpPost request = new HttpPost(uri);
-            request.setHeader("Content-Type", "application/octet-stream");
-            request.setHeader("Ocp-Apim-Subscription-Key", key);
-
-            StringEntity reqEntity = new StringEntity(Arrays.toString(strings));
-            request.setEntity(reqEntity);
-            HttpResponse response = httpclient.execute(request);
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) {
-                result = EntityUtils.toString(entity);
-            }
-
-            JSONObject emotionData = new JSONObject(result);
-
-            return emotionData;
-        } catch (Exception e) {
-            JSONObject aa = null;
-            return aa;
         }
     }
 
@@ -181,5 +119,53 @@ public class MainActivity extends AppCompatActivity {
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+    private class SyncedTask extends AsyncTask<String, Integer, JSONObject> {
+        @Override
+        protected JSONObject doInBackground(String... params) {
+            posty(url,getResources().getString(R.string.Sub_key),imagebytes);
+            return null;
+        }
+
+        protected void onPostExecute(Double result){
+            Toast.makeText(getApplicationContext(), "command sent", Toast.LENGTH_LONG).show();
+        }
+
+        protected void onProgressUpdate(Integer... progress){
+            Toast.makeText(getApplicationContext(),progress[0].toString(),Toast.LENGTH_LONG).show();
+        }
+
+        public JSONObject posty(String url, String key, byte[]... strings) {
+            String result = "";
+
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpPost request = new HttpPost(url);
+
+            try {
+//                URIBuilder builder = new URIBuilder(url);
+//                URI uri = builder.build();
+                request.setHeader("Content-Type", "application/octet-stream");
+                request.setHeader("Ocp-Apim-Subscription-Key", key);
+
+
+                StringEntity reqEntity = new StringEntity(Arrays.toString(strings));
+                request.setEntity(reqEntity);
+                HttpResponse response = httpClient.execute(request);
+                HttpEntity entity = response.getEntity();
+
+                if (entity != null) {
+                    result = EntityUtils.toString(entity);
+                }
+                if(result != null) {
+                    jsonResponse = new JSONObject(result);
+                }
+                return jsonResponse;
+            } catch (Throwable throwable){
+                throwable.printStackTrace();
+                return null;
+            }
+        }
     }
 }
