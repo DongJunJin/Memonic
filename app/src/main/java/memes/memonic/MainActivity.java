@@ -27,9 +27,11 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -52,10 +54,9 @@ public class MainActivity extends AppCompatActivity {
     byte[] imagebytes;
     private Uri outputFileUri;
     Intent cameraIntent;
-    JSONObject jsonResponse;
-    String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize";
+    JSONArray jsonResponse;
+    String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize/";
     File file;
-    String tossValue;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,15 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
             }
         });
-
-//        ConnectivityManager cm =
-//                (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-//
-//        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-//        boolean isConnected = activeNetwork != null &&
-//                activeNetwork.isConnectedOrConnecting();
-//
-//        Log.d("Network", isConnected ? "works" : "doesnt work");
+        
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -126,102 +119,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("Success" , "Success");
                 //Convert to Base64
                 baos = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                //bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                 inputStream = new ByteArrayInputStream(baos.toByteArray());
-                //imagebytes = baos.toByteArray();
                 try {
                     imagebytes = FileUtils.readFileToByteArray(file);
-                    tossValue = Base64.encodeToString(imagebytes, Base64.DEFAULT);
-                    Log.d("Value", tossValue);
+                    //tossValue = imagebytes.toString();
+                    //tossValue = Base64.encodeToString(imagebytes, Base64.DEFAULT);
+
+                    //Log.d("Value", tossValue);
+                    Log.d("Value2", imagebytes.toString());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
-//                if(tossValue != null){
-//                        Log.d("Penis Head", tossValue);
-//                    String source = file.toURI().toString();
-//                    args = new Bundle();
-//                    store = new Bundle();
-//                    args.putString("Imagefile", source);
-
-//            InputStream iStream = null;
-//            try {
-//                iStream = getContentResolver().openInputStream(outputFileUri);
-//                imagebytes = getBytes(iStream);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-//            RandomAccessFile f = null;
-//            try {
-//                f = new RandomAccessFile(file.getAbsolutePath(), "r");
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-////                imagebytes = new byte[0];
-//            try {
-//                imagebytes = new byte[(int)f.length()];
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                f.readFully(imagebytes);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            try {
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-//            int bytes = bitmap.getByteCount();
-//            ByteBuffer buffer = ByteBuffer.allocate(bytes); //Create a new buffer
-//            bitmap.copyPixelsToBuffer(buffer); //Move the byte data to the buffer
-
-//            imagebytes = buffer.array(); //Get the underlying array containing the data.
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
         }
     }
-    }
-
-//    public void run() {
-//        Image mImage = (Image) file;
-//        ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
-//        byte[] bytes = new byte[buffer.remaining()];
-//        buffer.get(bytes);
-//        FileOutputStream output = null;
-//        try {
-//            output = new FileOutputStream(file.getAbsolutePath());
-//            output.write(bytes);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            mImage.close();
-//            if (null != output) {
-//                try {
-//                    output.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
-
-    public byte[] getBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
-
-        int len = 0;
-        while ((len = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, len);
-        }
-        return byteBuffer.toByteArray();
     }
 
     private boolean isNetworkAvailable() {
@@ -234,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     private class SyncedTask extends AsyncTask<String, Integer, JSONObject> {
         @Override
         protected JSONObject doInBackground(String... params) {
-            posty(url,"afac5dce35cb428eabff3e082800df9b",tossValue);
+            posty(url,"afac5dce35cb428eabff3e082800df9b",imagebytes);
             return null;
         }
 
@@ -246,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),progress[0].toString(),Toast.LENGTH_LONG).show();
         }
 
-        public JSONObject posty(String url, String key, String... strings) {
+        public JSONArray posty(String url, String key, byte[] strings) {
             String result = "";
 
                 HttpClient httpClient = new DefaultHttpClient();
@@ -258,8 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 request.setHeader("Content-Type", "application/octet-stream");
                 request.setHeader("Ocp-Apim-Subscription-Key", key);
 
-
-                StringEntity reqEntity = new StringEntity(Arrays.toString(strings));
+                ByteArrayEntity reqEntity = new ByteArrayEntity(strings);
                 request.setEntity(reqEntity);
                 HttpResponse response = httpClient.execute(request);
                 HttpEntity entity = response.getEntity();
@@ -268,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     result = EntityUtils.toString(entity);
                 }
                 if(result != null) {
-                    jsonResponse = new JSONObject(result);
+                    jsonResponse = new JSONArray(result);
                 }
                 return jsonResponse;
             } catch (Throwable throwable){
