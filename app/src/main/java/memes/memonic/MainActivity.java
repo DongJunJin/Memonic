@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -33,8 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int CAMERA_REQUEST = 1888;
     private ImageView imageView;
+    private MediaPlayer mMediaPlayer;
     Bitmap photo;
-    byte[] imagebytes;
+    byte[] imageBytes;
     JSONObject jsonResponse;
     String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize";
 
@@ -53,14 +55,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     , 1);
         }
-        //this.imageView = (ImageView) this.findViewById(R.id.imageView1);
 
         ImageView pushButton = (ImageView) this.findViewById(R.id.push);
 
         pushButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (imagebytes != null && isNetworkAvailable()) {
+                if (imageBytes != null && isNetworkAvailable()) {
                     new SyncedTask().execute();
                     Log.d("YAY", "SUCCESS");
                 } else {
@@ -79,25 +80,125 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ConnectivityManager cm =
+        ConnectivityManager connm =
                 (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        NetworkInfo activeNetwork = connm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
 
         Log.d("Network", isConnected ? "works" : "doesnt work");
+
+
+        ImageView am = (ImageView) this.findViewById(R.id.am);
+        am.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.am);
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+            }
+        });
+
+        ImageView cm = (ImageView) this.findViewById(R.id.cm);
+        cm.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.cm);
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
+            }
+        });
+        ImageView crm = (ImageView) this.findViewById(R.id.crm);
+        crm.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.crm);
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
+            }
+        });
+        ImageView dm = (ImageView) this.findViewById(R.id.dm);
+        dm.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.dm);
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
+            }
+        });
+        ImageView em = (ImageView) this.findViewById(R.id.em);
+        em.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.em);
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
+            }
+        });
+        ImageView gm = (ImageView) this.findViewById(R.id.gm);
+        gm.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (mMediaPlayer == null) {
+                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.gm);
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
+            }
+        });
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             photo = (Bitmap) data.getExtras().get("data");
-            //imageView.setImageBitmap(photo);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            imagebytes = baos.toByteArray();
+            imageBytes = baos.toByteArray();
         }
+    }
+
+    private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            releaseMediaPlayer();
+        }
+    };
+
+
+    private void releaseMediaPlayer() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releaseMediaPlayer();
     }
 
     private boolean isNetworkAvailable() {
@@ -111,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
     private class SyncedTask extends AsyncTask<String, Integer, JSONObject> {
         @Override
         protected JSONObject doInBackground(String... params) {
-            posty(url,"afac5dce35cb428eabff3e082800df9b",imagebytes);
+            posty(url,"afac5dce35cb428eabff3e082800df9b",imageBytes);
             return null;
         }
 
@@ -130,8 +231,6 @@ public class MainActivity extends AppCompatActivity {
                 HttpPost request = new HttpPost(url);
 
             try {
-//                URIBuilder builder = new URIBuilder(url);
-//                URI uri = builder.build();
                 request.setHeader("Content-Type", "application/octet-stream");
                 request.setHeader("Ocp-Apim-Subscription-Key", key);
 

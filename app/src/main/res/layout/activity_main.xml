@@ -6,6 +6,77 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <ImageView
+            android:id="@+id/cm"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_weight="0.05"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
+            android:src="@mipmap/ic_music_note_black_48dp">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/dm"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_weight="0.05"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
+            android:src="@mipmap/ic_music_note_black_48dp">
+        </ImageView>
+        <ImageView
+            android:id="@+id/em"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_weight="0.05"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
+            android:src="@mipmap/ic_music_note_black_48dp">
+
+        </ImageView>
+
+        <ImageView
+            android:id="@+id/gm"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_weight="0.05"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
+            android:src="@mipmap/ic_music_note_black_48dp">
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/am"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_weight="0.05"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
+            android:src="@mipmap/ic_music_note_black_48dp">
+
+        </ImageView>
+        <ImageView
+            android:id="@+id/crm"
+            android:layout_width="wrap_content"
+            android:layout_height="52dp"
+            android:layout_weight="0.05"
+            android:paddingLeft="5px"
+            android:paddingRight="5px"
+            android:src="@mipmap/ic_music_note_black_48dp">
+
+        </ImageView>
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
