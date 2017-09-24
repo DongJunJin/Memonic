@@ -1,6 +1,7 @@
 package memes.memonic;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,7 +19,7 @@ public class JSONToMelody extends JSONObject {
 
     public ArrayList<String> arrEmotions;
     public ArrayList<Integer> arrMelodies;
-    public Context context;
+    public MainActivity activity;
 
 
 
@@ -61,14 +62,9 @@ public class JSONToMelody extends JSONObject {
         }
     }
 
-    public Context getContext() {
-        return context;
-    }
-
-
-    // get melody corresponding to emotion
+//     get melody corresponding to emotion
 //    Map<String,Integer> emotionToMelodyHashMap = new HashMap<String,Integer>();
-//    emotionToMelodyHashMap.put("anger", MainActivity.ExtraData().R.raw.cw);
+//    emotionToMelodyHashMap.Entry("anger",);
 //    emotionToMelodyHashMap.put("disgust", R.raw.em);
 //    emotionToMelodyHashMap.put("happiness", R.raw.gm);
 //    emotionToMelodyHashMap.put("neutral", R.raw.am);
