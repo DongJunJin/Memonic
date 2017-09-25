@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                     , 1);
         }
-        //this.imageView = (ImageView) this.findViewById(R.id.imageView1);
         ImageView am = (ImageView) this.findViewById(R.id.am);
         am.setOnClickListener(new View.OnClickListener() {
 
@@ -255,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected JSONArray doInBackground(String... params) {
-            return posty(url,"afac5dce35cb428eabff3e082800df9b",imagebytes);
+            return posty(url, getResources().getString(R.string.Sub_key),imagebytes); //Insert Subscription for Emotion API Key Here
         }
 
         protected void onPostExecute(JSONArray jsonArray){
@@ -277,11 +276,6 @@ public class MainActivity extends AppCompatActivity {
                             while(mMediaPlayer.isPlaying()){
                             }
                             mMediaPlayer = null;
-//                            try {
-//                                Thread.sleep(3000);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
                         }
                     }
                 }
@@ -299,8 +293,6 @@ public class MainActivity extends AppCompatActivity {
                 HttpPost request = new HttpPost(url);
 
             try {
-//                URIBuilder builder = new URIBuilder(url);
-//                URI uri = builder.build();
                 request.setHeader("Content-Type", "application/octet-stream");
                 request.setHeader("Ocp-Apim-Subscription-Key", key);
 
