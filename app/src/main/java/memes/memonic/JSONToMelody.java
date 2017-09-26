@@ -1,8 +1,5 @@
 package memes.memonic;
 
-import android.content.Context;
-import android.content.res.Resources;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,13 +12,10 @@ import java.util.Map;
  * Created by tarunkhanna on 24/09/17.
  */
 
-public class JSONToMelody extends JSONObject {
-
-    public ArrayList<String> arrEmotions;
-    public ArrayList<Integer> arrMelodies;
-    public MainActivity activity;
-
-
+public class JSONToMelody extends JSONArray{
+    public static ArrayList<String> arrEmotions = new ArrayList<>();
+    public static ArrayList<Integer> arrMelodies = new ArrayList<>();
+    public static Map<String,Integer> emotionToMelodyHashMap = new HashMap<>();
 
     String findMaxEmotion(JSONObject json) {
         json = json.optJSONObject("scores");
@@ -39,7 +33,6 @@ public class JSONToMelody extends JSONObject {
                 }
 
             } catch(Exception e) {
-                // ignore
                 e.printStackTrace();
             }
         }
@@ -47,46 +40,27 @@ public class JSONToMelody extends JSONObject {
         return maxEmotion;
     }
 
-
-
-    // wrapper for each face analyzed
-    void findEachMaxEmotion(JSONArray jsonArr) {
+    // wrapper to analyze each face
+    ArrayList<String> findEachMaxEmotion(JSONArray jsonArr) {
 
         int size = jsonArr.length();
         for (int i = 0; i < size; i++) {
             try {
-                arrEmotions.add(findMaxEmotion(jsonArr.getJSONObject(i)));
+                this.arrEmotions.add(findMaxEmotion(jsonArr.getJSONObject(i)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        return this.arrEmotions;
     }
 
-//     get melody corresponding to emotion
-//    Map<String,Integer> emotionToMelodyHashMap = new HashMap<String,Integer>();
-//    emotionToMelodyHashMap.Entry("anger",);
-//    emotionToMelodyHashMap.put("disgust", R.raw.em);
-//    emotionToMelodyHashMap.put("happiness", R.raw.gm);
-//    emotionToMelodyHashMap.put("neutral", R.raw.am);
-//    emotionToMelodyHashMap.put("sadness", R.raw.dm);
-//    emotionToMelodyHashMap.put("surprise", R.raw.crm);
+    ArrayList<Integer> createMelodiesArray() {
+        int size = this.arrEmotions.size();
 
+        for (int i = 0; i < size; i++) {
+            this.arrMelodies.add(emotionToMelodyHashMap.get(arrEmotions.get(i)));
+        }
 
-
-
-    // create melodies list
-    //melodiesArr
-
-//    ArrayList<Integer> createMelodiesArray() {
-//        int size = arrEmotions.size();
-//
-//        for (int i = 0; i < size; i++) {
-//            arrMelodies.add(emotionToMelodyHashMap.get(arrEmotions.get(i)));
-//        }
-//
-//        return arrMelodies;
-//    }
-
-
-
+        return this.arrMelodies;
+    }
 }

@@ -32,16 +32,12 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonResponse;
     String url = "https://westus.api.cognitive.microsoft.com/emotion/v1.0/recognize/";
     File file;
-    Map<String,Integer> emotionToMelodyHashMap;
     TextView output;
     ImageView resultView;
+    JSONToMelody jsonToM; //= new JSONToMelody();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -115,13 +111,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        emotionToMelodyHashMap = new HashMap<>();
-        emotionToMelodyHashMap.put("anger", R.raw.cm);
-        emotionToMelodyHashMap.put("disgust", R.raw.em);
-        emotionToMelodyHashMap.put("happiness", R.raw.gm);
-        emotionToMelodyHashMap.put("neutral", R.raw.am);
-        emotionToMelodyHashMap.put("sadness", R.raw.dm);
-        emotionToMelodyHashMap.put("surprise", R.raw.crm);
+
+        // Configure emotionToMelodyHashMap HashMap
+        jsonToM.emotionToMelodyHashMap.put("anger", R.raw.cm);
+        jsonToM.emotionToMelodyHashMap.put("disgust", R.raw.em);
+        jsonToM.emotionToMelodyHashMap.put("happiness", R.raw.gm);
+        jsonToM.emotionToMelodyHashMap.put("neutral", R.raw.am);
+        jsonToM.emotionToMelodyHashMap.put("sadness", R.raw.dm);
+        jsonToM.emotionToMelodyHashMap.put("surprise", R.raw.crm);
     }
 
     private void initializeNotesOnUI() {
@@ -209,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(JSONArray jsonArray){
             Log.d("Results", jsonArray.toString());
             if(jsonArray != null){
-                JSONToMelody jsonToM = new JSONToMelody();
+                jsonToM = new JSONToMelody();
                 ArrayList<String> s = jsonToM.findEachMaxEmotion(jsonArray);
                 notesArr = jsonToM.createMelodiesArray();
                 Log.d("Number", String.valueOf(notesArr.size()) );
@@ -227,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
                             mMediaPlayer = null;
                         }
                     }
+
+                    if (notesArr.size() == 0) output.append("No Results but Request successful\n");
                 }
             }
         }
@@ -260,59 +259,5 @@ public class MainActivity extends AppCompatActivity {
                 return null;
             }
         }
-    }
-
-    public class JSONToMelody extends JSONArray{
-        public ArrayList<String> arrEmotions = new ArrayList<>();
-        public ArrayList<Integer> arrMelodies = new ArrayList<>();
-
-        String findMaxEmotion(JSONObject json) {
-            json = json.optJSONObject("scores");
-            Iterator<String> jsonKeys = json.keys();
-
-            String maxEmotion = "";
-            Double maxVal = Double.MIN_VALUE;
-            while (jsonKeys.hasNext()) {
-                String key = jsonKeys.next();
-                try {
-                    Double temp = json.optDouble(key, Double.MIN_VALUE);
-                    if (temp > maxVal) {
-                        maxEmotion = key;
-                        maxVal = temp;
-                    }
-
-                } catch(Exception e) {
-                    // ignore
-                    e.printStackTrace();
-                }
-            }
-
-            return maxEmotion;
-        }
-
-        // wrapper for each face analyzed
-        ArrayList<String> findEachMaxEmotion(JSONArray jsonArr) {
-
-            int size = jsonArr.length();
-            for (int i = 0; i < size; i++) {
-                try {
-                    String s = findMaxEmotion(jsonArr.getJSONObject(i));
-                    arrEmotions.add(findMaxEmotion(jsonArr.getJSONObject(i)));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            return arrEmotions;
-        }
-
-    ArrayList<Integer> createMelodiesArray() {
-        int size = arrEmotions.size();
-
-        for (int i = 0; i < size; i++) {
-            arrMelodies.add(emotionToMelodyHashMap.get(arrEmotions.get(i)));
-        }
-
-        return arrMelodies;
-    }
     }
 }
