@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -24,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -38,15 +38,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -82,84 +77,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     , 1);
         }
-        ImageView am = (ImageView) this.findViewById(R.id.am);
-        am.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                if (mMediaPlayer == null) {
-                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.am);
-                    mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
-                }
-            }
-        });
+        initializeNotesOnUI();
 
-        ImageView cm = (ImageView) this.findViewById(R.id.cm);
-        cm.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mMediaPlayer == null) {
-                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.cm);
-                    mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
-                }
-
-            }
-        });
-        ImageView crm = (ImageView) this.findViewById(R.id.crm);
-        crm.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mMediaPlayer == null) {
-                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.crm);
-                    mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
-                }
-
-            }
-        });
-        ImageView dm = (ImageView) this.findViewById(R.id.dm);
-        dm.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mMediaPlayer == null) {
-                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.dm);
-                    mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
-                }
-
-            }
-        });
-        ImageView em = (ImageView) this.findViewById(R.id.em);
-        em.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mMediaPlayer == null) {
-                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.em);
-                    mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
-                }
-
-            }
-        });
-        ImageView gm = (ImageView) this.findViewById(R.id.gm);
-        gm.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mMediaPlayer == null) {
-                    mMediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.gm);
-                    mMediaPlayer.start();
-                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
-                }
-
-            }
-        });
         ImageView pushButton = (ImageView) this.findViewById(R.id.push);
         output = (TextView) this.findViewById(R.id.output);
 
@@ -202,6 +122,35 @@ public class MainActivity extends AppCompatActivity {
         emotionToMelodyHashMap.put("neutral", R.raw.am);
         emotionToMelodyHashMap.put("sadness", R.raw.dm);
         emotionToMelodyHashMap.put("surprise", R.raw.crm);
+    }
+
+    private void initializeNotesOnUI() {
+        ArrayList<String> notes = new ArrayList<>();
+        notes.add("cm");
+        notes.add("em");
+        notes.add("gm");
+        notes.add("am");
+        notes.add("dm");
+        notes.add("crm");
+
+        for (int i = 0; i < notes.size(); i++) {
+            final String note = notes.get(i);
+
+            int resId = getResources().getIdentifier(notes.get(i), "id", getPackageName());
+            ImageView imageView = (ImageView) MainActivity.this.findViewById(resId);
+            imageView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    if (mMediaPlayer == null) {
+                        mMediaPlayer = MediaPlayer.create(MainActivity.this,
+                                Uri.parse("android.resource://"+getPackageName()+"/raw/"+note));
+                        mMediaPlayer.start();
+                        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                    }
+                }
+            });
+        }
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
