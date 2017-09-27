@@ -36,8 +36,8 @@ Otherwise (if it doesn't crash):
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Android](https://maven.apache.org/) - Dependency Management
+* [Microsoft Emotion API](https://azure.microsoft.com/en-us/services/cognitive-services/emotion/) - Facial Emotion Analysis
+* [Android Studio](https://developer.android.com/studio/index.html) - Android App Development
 
 ## Contributing
 
