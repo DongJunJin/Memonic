@@ -13,7 +13,9 @@ An Android phone with API v21 or higher
 ### Installing
 
 Download the project from [Github](https://github.com/DongJunJin/Memonic)
+
 Open with Android Studio
+
 Plug in your device and click Run
 
 ### Usage
