@@ -1,23 +1,4 @@
 <resources>
     <string name="app_name">Memonic</string>
-    <string name="Example">
-        "[{"
-    + "'faceRectangle': {"
-    +  "'top': 114,"
-    +  "'left': 212,"
-    +  "'width': 65,"
-    +  "'height': 65"
-    + "},"
-    + "'scores': {"
-    + "'anger': 1.0570484E-08,"
-    + "'contempt': 1.52679547E-09,"
-    + "'disgust': 1.60232943E-07,"
-    + "'fear': 6.00660363E-12,"
-    + "'happiness': 0.9999998,"
-    + "'neutral': 9.449728E-09,"
-    + "'sadness': 1.23025981E-08,"
-    + "'surprise': 9.91396E-10"
-    + "}]" </string>
-    <string name="Sub_key">INSERT KEY HERE</string>
-
+    <string name="api_url">https://apiv2.indico.io/</string>
 </resources>
